@@ -1,6 +1,4 @@
 
-use color_print::cformat;
-
 #[derive(Hash, Clone, Copy, Eq, PartialEq, Debug)]
 pub enum Player {
     Red, // First
@@ -28,10 +26,10 @@ impl Board {
 
         for i in 0..7 {
             string += match self.tiles[row][i] {
-                Tile::Empty => " . ".into(),
-                Tile::Piece(Player::Red) => cformat!(" <red>R</> "),
-                Tile::Piece(Player::Yellow) => cformat!(" <yellow>Y</> "),
-            }.as_str();
+                Tile::Empty => " . ",
+                Tile::Piece(Player::Red) => " R ",
+                Tile::Piece(Player::Yellow) => " Y ",
+            };
         }
 
         string += "|\n";
@@ -117,35 +115,19 @@ impl Board {
         None
     }
 
+    fn win_chains() -> [(i32, i32, i32, i32); 25] {
+        [ (0, 0, 0, 1), (1, 0, 0, 1), (2, 0, 0, 1), (3, 0, 0, 1), (4, 0, 0, 1), (5, 0, 0, 1)  // rows
+        , (0, 0, 1, 0),  (0, 1, 1, 0),  (0, 2, 1, 0),  (0, 3, 1, 0),  (0, 4, 1, 0),  (0, 5, 1, 0), (0, 6, 1, 0)  // columns 
+        , (3, 0, -1, 1), (4, 0, -1, 1), (5, 0, -1, 1), (5, 1, -1, 1), (5, 2, -1, 1), (5, 3, -1, 1)  // downward right
+        , (3, 6, -1, -1), (4, 6, -1, -1), (5, 6, -1, -1), (5, 5, -1, -1), (5, 4, -1, -1), (5, 3, -1, -1)  // downward left
+        ]
+    }
+
     // None if no winner (or game ongoing)
     pub fn winner(&self) -> Option<Player> {
-        // rows
-        for i in 0..6 {
-            if let Some(p) = self.win_on_chain(i, 0, 0, 1) {
-                return Some(p);
-            }
-        }
-
-        // cols
-        for i in 0..7 {
-            if let Some(p) = self.win_on_chain(0, i, 1, 0) {
-                return Some(p);
-            }
-        }
-
-        // downward right
-        let starts = [(3, 0), (4, 0), (5, 0), (5, 1), (5, 2), (5, 3)];
-        for (i, j) in starts {
-            if let Some(p) = self.win_on_chain(i, j, -1, 1) {
-                return Some(p);
-            }
-        }
-
-        // downward left
-        let starts = [(3, 6), (4, 6), (5, 6), (5, 5), (5, 4), (5, 3)];
-        for (i, j) in starts {
-            if let Some(p) = self.win_on_chain(i, j, -1, -1) {
-                return Some(p);
+        for (row, col, d_r, d_c) in Self::win_chains() {
+            if let Some(p) = self.win_on_chain(row, col, d_r, d_c) {
+                return Some(p)
             }
         }
 
@@ -185,5 +167,37 @@ impl Board {
                 panic!("Board in illegal state");
             }
         }
+    }
+
+    pub fn next_boards(&self) -> Vec<Board> {
+        let mut boards = vec![];
+        let Some(player) = self.next_to_move()
+            else { return boards };
+
+        for i in 0..7 {
+            if let Ok(next) = self.play(i, player) {
+                boards.push(next);
+            }
+        }
+
+        boards
+    }
+
+    // Subjective score. Positive / High means win better for Red (player 1). 
+    // Negative / Low means better for Yellow.
+    pub fn get_score(&self) -> i32 {
+        match &self.winner() {
+            Some(Player::Red) => return 1000000000,
+            Some(Player::Yellow) => return -1000000000,
+            _ => (),
+        }
+
+        if self.next_to_move() == None {
+            return 0;
+        }
+
+        todo!()
+        // Analyze the position along all win chains. For sure factor in blank spaces,
+        // 3 of a kind does nothing if it does not have a blank.
     }
 }
