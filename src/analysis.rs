@@ -50,7 +50,7 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
     })
 }
 
-fn update_parents(evaluated_boards: &HashMap<Board, i32>, curr_board: &Board, root_board: &Board) {
+fn update_parents(_evaluated_boards: &HashMap<Board, i32>, _curr_board: &Board, _root_board: &Board) {
     // pass
     
     // Examine parents, updating their values as necessary. You can stop early if the existing value
