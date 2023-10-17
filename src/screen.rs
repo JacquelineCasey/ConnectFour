@@ -127,6 +127,13 @@ fn spawn_tui_thread(receiver: mpsc::Receiver<ScreenUpdate>, input_sender: mpsc::
                     input_sender.send(state.input_buffer.clone()).expect("sends");
                     state.input_buffer.clear();
                 }
+                ScreenUpdate::CrosstermEvent(Event::Key(KeyEvent { 
+                    code: KeyCode::Backspace, kind: KeyEventKind::Press, .. 
+                })) => {
+                    if state.input_buffer.len() > 0 {
+                        state.input_buffer.pop();
+                    }
+                },
                 ScreenUpdate::CrosstermEvent(_) => continue,
             }
 

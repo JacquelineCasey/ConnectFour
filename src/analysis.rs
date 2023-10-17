@@ -1,11 +1,13 @@
 
-use std::{thread::{spawn, JoinHandle}, sync::mpsc::{self, TryRecvError}, collections::{HashMap, VecDeque}};
+use std::{thread::{spawn, JoinHandle}, sync::mpsc::{self, TryRecvError}, collections::{HashMap, VecDeque}, time};
 use crate::{ScreenManager, board::Board};
 
 pub fn spawn_analysis_thread(screen: ScreenManager, 
         mut root_board: Board,
         receiver: mpsc::Receiver<Board>) -> JoinHandle<()> {
 
+    let mut last_update = time::Instant::now();    
+    
     return spawn(move || {
         let mut evaluated_boards: HashMap<Board, i32> = HashMap::new(); // Maps to value
         let mut boundary: VecDeque<Board> = VecDeque::new();  // Boards to analyze soon. BFS style queue.
@@ -14,7 +16,8 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
         boundary.extend(root_board.next_boards());
 
         loop {
-            if evaluated_boards.len() % 500 == 0 {
+            if time::Instant::now() - last_update > time::Duration::from_millis(200) {
+                last_update = time::Instant::now();
                 screen.update_analysis_count(evaluated_boards.len() as i32);
             }
 
