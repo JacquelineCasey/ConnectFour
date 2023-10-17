@@ -16,6 +16,13 @@ pub struct Board {
     pub tiles: [[Tile; 7]; 6], // row 0 is bottom!
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum AnalyzedTile {
+    Empty,
+    You,
+    Enemy
+}
+
 impl Board {
     pub fn new() -> Board {
         Board {tiles: [[Tile::Empty; 7]; 6]}
@@ -183,6 +190,72 @@ impl Board {
         boards
     }
 
+    fn score_window(window: &[AnalyzedTile]) -> i32 {
+        assert!(window.len() == 4);
+
+        let mut yours = 0;
+        let mut enemies = 0;
+
+        for tile in window {
+            if tile == &AnalyzedTile::You {
+                yours += 1;
+            }
+            else if tile == &AnalyzedTile::Enemy {
+                enemies += 1;
+            }
+        }
+
+        if enemies > 0 {
+            0
+        }
+        else {
+            match yours {
+                1 => 5,
+                2 => 50,
+                3 => 500,
+                _ => 0,
+            }
+        }
+    }
+
+    // Score for the player along a given chain.
+    fn player_score_on_chain(&self, chain: (i32, i32, i32, i32), player: Player) -> i32 {
+        let (mut row, mut col, d_r, d_c) = chain;
+        let mut chain = vec![];
+
+        let mut score = 0;
+
+        while Self::in_bounds(row, col) {
+            chain.push(match self.tiles[row as usize][col as usize] {
+                Tile::Empty => AnalyzedTile::Empty,
+                Tile::Piece(p) if p == player => AnalyzedTile::You,
+                _ => AnalyzedTile::Enemy,
+            });
+
+            row += d_r;
+            col += d_c;
+        }
+
+        // sliding window
+        for i in 0..chain.len() -3 {
+            score += Self::score_window(&chain[i..i+4]);
+        } 
+
+        score
+    }
+
+    fn pieces_played(&self) -> i32 {
+        let mut count = 0;
+        for row in self.tiles {
+            for tile in row {
+                if tile != Tile::Empty {
+                    count += 1;
+                }
+            }
+        }
+        count
+    }
+
     // Subjective score. Positive / High means win better for Red (player 1). 
     // Negative / Low means better for Yellow.
     pub fn get_score(&self) -> i32 {
@@ -196,8 +269,12 @@ impl Board {
             return 0;
         }
 
-        todo!()
-        // Analyze the position along all win chains. For sure factor in blank spaces,
-        // 3 of a kind does nothing if it does not have a blank.
+        let mut score = 0;
+        for chain in Self::win_chains() {
+            score += self.player_score_on_chain(chain, Player::Red);
+            score -= self.player_score_on_chain(chain, Player::Yellow);
+        }
+
+        score
     }
 }

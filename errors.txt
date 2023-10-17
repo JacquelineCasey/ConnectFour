@@ -1,219 +1,261 @@
-   Compiling connect_four v0.1.0 (/Users/jackcasey/cs-projects/Rust/ConnectFour)
-warning: unused imports: `Arc`, `Mutex`, `process::exit`, `time::Duration`
- --> src/screen.rs:1:39
-  |
-1 | use std::{io::{self, Stdout}, thread, time::Duration, sync::{Mutex, Arc, mpsc}, process::exit};
-  |                                       ^^^^^^^^^^^^^^         ^^^^^  ^^^         ^^^^^^^^^^^^^
-  |
-  = note: `#[warn(unused_imports)]` on by default
-
-warning: unused imports: `Constraint`, `Direction`, `Layout`, `Widget`, `self`
- --> src/screen.rs:5:15
-  |
-5 |     widgets::{Widget, Block, Borders, Paragraph, self},
-  |               ^^^^^^                             ^^^^
-6 |     layout::{Layout, Constraint, Direction, Rect, Margin},
-  |              ^^^^^^  ^^^^^^^^^^  ^^^^^^^^^
-
-warning: unused import: `std::io::stdin`
- --> src/main.rs:8:5
-  |
-8 | use std::io::stdin;
-  |     ^^^^^^^^^^^^^^
-
-warning: unused variable: `input_sender`
-  --> src/screen.rs:65:61
+warning: unused variable: `evaluated_boards`
+  --> src/analysis.rs:50:19
    |
-65 | fn spawn_tui_thread(receiver: mpsc::Receiver<ScreenUpdate>, input_sender: mpsc::Sender<String>) -> thread::JoinHandle<()> {
-   |                                                             ^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_input_sender`
+50 | fn update_parents(evaluated_boards: &HashMap<Board, i32>, curr_board: &Board, root_board: &Board) {
+   |                   ^^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_evaluated_boards`
    |
    = note: `#[warn(unused_variables)]` on by default
 
-warning: variable does not need to be mutable
-  --> src/main.rs:20:13
+warning: unused variable: `curr_board`
+  --> src/analysis.rs:50:59
    |
-20 |         let mut buf = String::new();
-   |             ----^^^
-   |             |
-   |             help: remove this `mut`
-   |
-   = note: `#[warn(unused_mut)]` on by default
+50 | fn update_parents(evaluated_boards: &HashMap<Board, i32>, curr_board: &Board, root_board: &Board) {
+   |                                                           ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_curr_board`
 
-warning: methods `next_boards` and `get_score` are never used
-   --> src/board.rs:174:12
+warning: unused variable: `root_board`
+  --> src/analysis.rs:50:79
+   |
+50 | fn update_parents(evaluated_boards: &HashMap<Board, i32>, curr_board: &Board, root_board: &Board) {
+   |                                                                               ^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_root_board`
+
+warning: unused variable: `analysis_send`
+  --> src/main.rs:18:10
+   |
+18 |     let (analysis_send, analysis_receive) = mpsc::channel();
+   |          ^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_analysis_send`
+
+warning: unused variable: `analysis_thread`
+  --> src/main.rs:19:9
+   |
+19 |     let analysis_thread = spawn_analysis_thread(screen.clone(), board.clone(), analysis_receive);
+   |         ^^^^^^^^^^^^^^^ help: if this is intentional, prefix it with an underscore: `_analysis_thread`
+
+warning: method `pieces_played` is never used
+   --> src/board.rs:247:8
     |
-21  | impl Board {
-    | ---------- methods in this implementation
+26  | impl Board {
+    | ---------- method in this implementation
 ...
-174 |     pub fn next_boards(&self) -> Vec<Board> {
-    |            ^^^^^^^^^^^
-...
-190 |     pub fn get_score(&self) -> i32 {
-    |            ^^^^^^^^^
+247 |     fn pieces_played(&self) -> i32 {
+    |        ^^^^^^^^^^^^^
     |
     = note: `#[warn(dead_code)]` on by default
 
-warning: field `input_receiver` is never read
-   --> src/screen.rs:131:5
-    |
-127 | pub struct ScreenManager {
-    |            ------------- field in this struct
-...
-131 |     input_receiver: mpsc::Receiver<String>,
-    |     ^^^^^^^^^^^^^^
-
-warning: `connect_four` (bin "connect_four") generated 7 warnings (run `cargo fix --bin "connect_four"` to apply 5 suggestions)
-    Finished dev [unoptimized + debuginfo] target(s) in 0.49s
+warning: `connect_four` (bin "connect_four") generated 6 warnings (run `cargo fix --bin "connect_four"` to apply 5 suggestions)
+    Finished dev [unoptimized + debuginfo] target(s) in 0.05s
      Running `target/debug/connect_four`
-Key(KeyEvent { code: Char('a'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('f'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('a'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('l'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('k'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('s'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('n'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('f'), modifiers: NONE, kind: Press, state: NONE })
-Key(KeyEvent { code: Char('c'), modifiers: CONTROL, kind: Press, state: NONE })
-thread 'main' panicked at 'message sends: SendError { .. }', src/screen.rs:150:59
+thread 'main' panicked at 'received: RecvError', src/screen.rs:192:52
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-thread 'main' panicked at 'messages sends: SendError { .. }', src/screen.rs:156:47
+thread 'main' panicked at 'messages sends: SendError { .. }', src/screen.rs:202:47
+thread '<unnamed>' panicked at 'They hung up!', src/analysis.rs:31:21
 stack backtrace:
-   0:        0x1024d07a3 - std::backtrace_rs::backtrace::libunwind::trace::h14243dc752b5beac
+thread '<unnamed>' panicked at 'messages sends: SendError { .. }', src/screen.rs:202:47
+   0:        0x10aee17d3 - std::backtrace_rs::backtrace::libunwind::trace::h14243dc752b5beac
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/../../backtrace/src/backtrace/libunwind.rs:93:5
-   1:        0x1024d07a3 - std::backtrace_rs::backtrace::trace_unsynchronized::h71ecb3a9455536a6
+   1:        0x10aee17d3 - std::backtrace_rs::backtrace::trace_unsynchronized::h71ecb3a9455536a6
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/../../backtrace/src/backtrace/mod.rs:66:5
-   2:        0x1024d07a3 - std::sys_common::backtrace::_print_fmt::h7e307467d6e88eaf
+   2:        0x10aee17d3 - std::sys_common::backtrace::_print_fmt::h7e307467d6e88eaf
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:65:5
-   3:        0x1024d07a3 - <std::sys_common::backtrace::_print::DisplayBacktrace as core::fmt::Display>::fmt::he60192cdeae7ff98
+   3:        0x10aee17d3 - <std::sys_common::backtrace::_print::DisplayBacktrace as core::fmt::Display>::fmt::he60192cdeae7ff98
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:44:22
-   4:        0x1024ecbbb - core::fmt::rt::Argument::fmt::hef24bdd6ecabdaa4
+   4:        0x10aefdbeb - core::fmt::rt::Argument::fmt::hef24bdd6ecabdaa4
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/fmt/rt.rs:138:9
-   5:        0x1024ecbbb - core::fmt::write::hccf73e6ac9b102cd
+   5:        0x10aefdbeb - core::fmt::write::hccf73e6ac9b102cd
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/fmt/mod.rs:1094:21
-   6:        0x1024cd8de - std::io::Write::write_fmt::h2da296a2a97aa10d
+   6:        0x10aede90e - std::io::Write::write_fmt::h2da296a2a97aa10d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/io/mod.rs:1714:15
-   7:        0x1024d059a - std::sys_common::backtrace::_print::h57786acb50d0c08a
+   7:        0x10aee15ca - std::sys_common::backtrace::_print::h57786acb50d0c08a
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:47:5
-   8:        0x1024d059a - std::sys_common::backtrace::print::h57a90601b74ca1dc
+   8:        0x10aee15ca - std::sys_common::backtrace::print::h57a90601b74ca1dc
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:34:9
-   9:        0x1024d1a75 - std::panicking::default_hook::{{closure}}::h8463146ca7fe4cbf
+   9:        0x10aee2aa5 - std::panicking::default_hook::{{closure}}::h8463146ca7fe4cbf
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:269:22
-  10:        0x1024d181f - std::panicking::default_hook::h473c81bbe30d7761
+  10:        0x10aee284f - std::panicking::default_hook::h473c81bbe30d7761
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:288:9
-  11:        0x1024d1fd0 - std::panicking::rust_panic_with_hook::h0ff95e3e20549b0d
+  11:        0x10aee3000 - std::panicking::rust_panic_with_hook::h0ff95e3e20549b0d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:705:13
-  12:        0x1024d1ef3 - std::panicking::begin_panic_handler::{{closure}}::h5e967ae12a1d4ba1
+  12:        0x10aee2f23 - std::panicking::begin_panic_handler::{{closure}}::h5e967ae12a1d4ba1
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:597:13
-  13:        0x1024d0ba9 - std::sys_common::backtrace::__rust_end_short_backtrace::h5c230463e113192d
+  13:        0x10aee1bd9 - std::sys_common::backtrace::__rust_end_short_backtrace::h5c230463e113192d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:151:18
-  14:        0x1024d1c2d - rust_begin_unwind
+  14:        0x10aee2c5d - rust_begin_unwind
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:593:5
-  15:        0x1024f5d33 - core::panicking::panic_fmt::h9d91d0e3e7a6cd1a
+  15:        0x10af075b3 - core::panicking::panic_fmt::h9d91d0e3e7a6cd1a
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:67:14
-  16:        0x1024f61c5 - core::result::unwrap_failed::h03051b7cd86bca29
+  16:        0x10af07a45 - core::result::unwrap_failed::h03051b7cd86bca29
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/result.rs:1651:5
-  17:        0x102430b8f - core::result::Result<T,E>::expect::h28259a2e059b2a0f
+  17:        0x10ae1343f - core::result::Result<T,E>::expect::ha1a5b847a974d803
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/result.rs:1033:23
-  18:        0x102424892 - <connect_four::screen::ScreenManager as core::ops::drop::Drop>::drop::h12e92da63c075b83
-                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/screen.rs:156:9
-  19:        0x102421575 - core::ptr::drop_in_place<connect_four::screen::ScreenManager>::h20ea5540d6c99b22
+  18:        0x10ae11dc9 - <connect_four::screen::ScreenManager as core::ops::drop::Drop>::drop::h6ebfd9e2f1a611d0
+                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/screen.rs:202:9
+  19:        0x10ae0d2d5 - core::ptr::drop_in_place<connect_four::screen::ScreenManager>::h812718f27baa1afb
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ptr/mod.rs:497:1
-  20:        0x102434c21 - connect_four::main::h410e35d845e9fe41
-                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/main.rs:46:1
-  21:        0x1024205fe - core::ops::function::FnOnce::call_once::hc6fa21b2c24b9937
+  20:        0x10ae17c5f - connect_four::main::hd02805dfdfe48f89
+                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/main.rs:54:1
+  21:        0x10ae0bbee - core::ops::function::FnOnce::call_once::hf5c23ac131faf89d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ops/function.rs:250:5
-  22:        0x102432dd1 - std::sys_common::backtrace::__rust_begin_short_backtrace::h2634971bdf74b53b
+  22:        0x10ae379c1 - std::sys_common::backtrace::__rust_begin_short_backtrace::hc4f41948d2aa61c4
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:135:18
-  23:        0x1024173e4 - std::rt::lang_start::{{closure}}::h97b0f0deb6553808
+  23:        0x10ae286b4 - std::rt::lang_start::{{closure}}::hdb4b1d378bba8749
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:166:18
-  24:        0x1024ca23a - core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once::h4945e40fadb4e102
+  24:        0x10aedb32a - core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once::h4945e40fadb4e102
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ops/function.rs:284:13
-  25:        0x1024ca23a - std::panicking::try::do_call::h3f89e890c35ee58d
+  25:        0x10aedb32a - std::panicking::try::do_call::h3f89e890c35ee58d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:500:40
-  26:        0x1024ca23a - std::panicking::try::hd7e13b924cbe36ec
+  26:        0x10aedb32a - std::panicking::try::hd7e13b924cbe36ec
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:464:19
-  27:        0x1024ca23a - std::panic::catch_unwind::h846dde69138eb551
+  27:        0x10aedb32a - std::panic::catch_unwind::h846dde69138eb551
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panic.rs:142:14
-  28:        0x1024ca23a - std::rt::lang_start_internal::{{closure}}::h0db65befb440833b
+  28:        0x10aedb32a - std::rt::lang_start_internal::{{closure}}::h0db65befb440833b
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:148:48
-  29:        0x1024ca23a - std::panicking::try::do_call::hf8ebe7d8efbefca2
+  29:        0x10aedb32a - std::panicking::try::do_call::hf8ebe7d8efbefca2
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:500:40
-  30:        0x1024ca23a - std::panicking::try::hb7bf29765365750b
+  30:        0x10aedb32a - std::panicking::try::hb7bf29765365750b
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:464:19
-  31:        0x1024ca23a - std::panic::catch_unwind::h49d9b5ea01685039
+  31:        0x10aedb32a - std::panic::catch_unwind::h49d9b5ea01685039
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panic.rs:142:14
-  32:        0x1024ca23a - std::rt::lang_start_internal::hf7e13fcf609c9250
+  32:        0x10aedb32a - std::rt::lang_start_internal::hf7e13fcf609c9250
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:148:20
-  33:        0x1024173b7 - std::rt::lang_start::hdb28f1e22577fc41
+  33:        0x10ae28687 - std::rt::lang_start::h130402154e1fa82a
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:165:17
-  34:        0x102435368 - _main
+  34:        0x10ae18538 - _main
   35:     0x7ff81853041f - <unknown>
 thread 'main' panicked at 'panic in a function that cannot unwind', library/core/src/panicking.rs:126:5
 stack backtrace:
-   0:        0x1024d07a3 - std::backtrace_rs::backtrace::libunwind::trace::h14243dc752b5beac
+   0:        0x10aee17d3 - std::backtrace_rs::backtrace::libunwind::trace::h14243dc752b5beac
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/../../backtrace/src/backtrace/libunwind.rs:93:5
-   1:        0x1024d07a3 - std::backtrace_rs::backtrace::trace_unsynchronized::h71ecb3a9455536a6
+   1:        0x10aee17d3 - std::backtrace_rs::backtrace::trace_unsynchronized::h71ecb3a9455536a6
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/../../backtrace/src/backtrace/mod.rs:66:5
-   2:        0x1024d07a3 - std::sys_common::backtrace::_print_fmt::h7e307467d6e88eaf
+   2:        0x10aee17d3 - std::sys_common::backtrace::_print_fmt::h7e307467d6e88eaf
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:65:5
-   3:        0x1024d07a3 - <std::sys_common::backtrace::_print::DisplayBacktrace as core::fmt::Display>::fmt::he60192cdeae7ff98
+   3:        0x10aee17d3 - <std::sys_common::backtrace::_print::DisplayBacktrace as core::fmt::Display>::fmt::he60192cdeae7ff98
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:44:22
-   4:        0x1024ecbbb - core::fmt::rt::Argument::fmt::hef24bdd6ecabdaa4
+   4:        0x10aefdbeb - core::fmt::rt::Argument::fmt::hef24bdd6ecabdaa4
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/fmt/rt.rs:138:9
-   5:        0x1024ecbbb - core::fmt::write::hccf73e6ac9b102cd
+   5:        0x10aefdbeb - core::fmt::write::hccf73e6ac9b102cd
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/fmt/mod.rs:1094:21
-   6:        0x1024cd8de - std::io::Write::write_fmt::h2da296a2a97aa10d
+   6:        0x10aede90e - std::io::Write::write_fmt::h2da296a2a97aa10d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/io/mod.rs:1714:15
-   7:        0x1024d059a - std::sys_common::backtrace::_print::h57786acb50d0c08a
+   7:        0x10aee15ca - std::sys_common::backtrace::_print::h57786acb50d0c08a
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:47:5
-   8:        0x1024d059a - std::sys_common::backtrace::print::h57a90601b74ca1dc
+   8:        0x10aee15ca - std::sys_common::backtrace::print::h57a90601b74ca1dc
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:34:9
-   9:        0x1024d1a75 - std::panicking::default_hook::{{closure}}::h8463146ca7fe4cbf
+   9:        0x10aee2aa5 - std::panicking::default_hook::{{closure}}::h8463146ca7fe4cbf
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:269:22
-  10:        0x1024d181f - std::panicking::default_hook::h473c81bbe30d7761
+  10:        0x10aee284f - std::panicking::default_hook::h473c81bbe30d7761
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:288:9
-  11:        0x1024d1fd0 - std::panicking::rust_panic_with_hook::h0ff95e3e20549b0d
+  11:        0x10aee3000 - std::panicking::rust_panic_with_hook::h0ff95e3e20549b0d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:705:13
-  12:        0x1024d1eb2 - std::panicking::begin_panic_handler::{{closure}}::h5e967ae12a1d4ba1
-                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:595:13
-  13:        0x1024d0ba9 - std::sys_common::backtrace::__rust_end_short_backtrace::h5c230463e113192d
+  12:        0x10aee2f23 - std::panicking::begin_panic_handler::{{closure}}::h5e967ae12a1d4ba1
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:597:13
+  13:        0x10aee1bd9 - std::sys_common::backtrace::__rust_end_short_backtrace::h5c230463e113192d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:151:18
-  14:        0x1024d1c2d - rust_begin_unwind
+  14:        0x10aee2c5d - rust_begin_unwind
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:593:5
-  15:        0x1024f5d73 - core::panicking::panic_nounwind_fmt::ha147f36c1e225894
-                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:96:14
-  16:        0x1024f5e1b - core::panicking::panic_nounwind::h59654c700fa02d0b
-                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:126:5
-  17:        0x1024f5f85 - core::panicking::panic_cannot_unwind::h1988846a6b7d7ed5
-                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:189:5
-  18:        0x102435129 - connect_four::main::h410e35d845e9fe41
-                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/main.rs:10:1
-  19:        0x1024205fe - core::ops::function::FnOnce::call_once::hc6fa21b2c24b9937
-                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ops/function.rs:250:5
-  20:        0x102432dd1 - std::sys_common::backtrace::__rust_begin_short_backtrace::h2634971bdf74b53b
+  15:        0x10af075b3 - core::panicking::panic_fmt::h9d91d0e3e7a6cd1a
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:67:14
+  16:        0x10af07a45 - core::result::unwrap_failed::h03051b7cd86bca29
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/result.rs:1651:5
+  17:        0x10ae1343f - core::result::Result<T,E>::expect::ha1a5b847a974d803
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/result.rs:1033:23
+  18:        0x10ae11dc9 - <connect_four::screen::ScreenManager as core::ops::drop::Drop>::drop::h6ebfd9e2f1a611d0
+                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/screen.rs:202:9
+  19:        0x10ae0d2d5 - core::ptr::drop_in_place<connect_four::screen::ScreenManager>::h812718f27baa1afb
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ptr/mod.rs:497:1
+  20:        0x10ae0e485 - core::ptr::drop_in_place<connect_four::analysis::spawn_analysis_thread::{{closure}}>::h43ad0159fbbf2329
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ptr/mod.rs:497:1
+  21:        0x10ae37a1c - connect_four::analysis::spawn_analysis_thread::{{closure}}::hc27a2c40b06106ec
+                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/analysis.rs:47:5
+  22:        0x10ae379dd - std::sys_common::backtrace::__rust_begin_short_backtrace::hd70e3f985b92fe5e
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:135:18
-  21:        0x1024173e4 - std::rt::lang_start::{{closure}}::h97b0f0deb6553808
+  23:        0x10ae35182 - std::thread::Builder::spawn_unchecked_::{{closure}}::{{closure}}::h70c034172f8d8d35
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/thread/mod.rs:529:17
+  24:        0x10ae1e4a5 - <core::panic::unwind_safe::AssertUnwindSafe<F> as core::ops::function::FnOnce<()>>::call_once::hb28f656f51fa6aa5
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panic/unwind_safe.rs:271:9
+  25:        0x10ae2a48f - std::panicking::try::do_call::h7fe2ccb229893a70
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:500:40
+  26:        0x10ae2a79d - ___rust_try
+  27:        0x10ae2a15c - std::panicking::try::h2c3685eaccdd7f4a
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:464:19
+  28:        0x10ae3489f - std::panic::catch_unwind::h0f9573ee121e5bf3
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panic.rs:142:14
+  29:        0x10ae3489f - std::thread::Builder::spawn_unchecked_::{{closure}}::h6cc8e86e117c8669
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/thread/mod.rs:528:30
+  30:        0x10ae0b931 - core::ops::function::FnOnce::call_once{{vtable.shim}}::hc15657d382bfa6f1
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ops/function.rs:250:5
+  31:        0x10aee7199 - <alloc::boxed::Box<F,A> as core::ops::function::FnOnce<Args>>::call_once::hd3f407e37d0997c0
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/alloc/src/boxed.rs:1993:9
+  32:        0x10aee7199 - <alloc::boxed::Box<F,A> as core::ops::function::FnOnce<Args>>::call_once::ha379d05e5207e350
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/alloc/src/boxed.rs:1993:9
+  33:        0x10aee7199 - std::sys::unix::thread::Thread::new::thread_start::ha4a6ad20828e5661
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys/unix/thread.rs:108:17
+  34:     0x7ff81888a1d3 - __pthread_start
+thread '<unnamed>' panicked at 'panic in a function that cannot unwind', library/core/src/panicking.rs:126:5
+stack backtrace:
+   0:        0x10aee17d3 - std::backtrace_rs::backtrace::libunwind::trace::h14243dc752b5beac
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/../../backtrace/src/backtrace/libunwind.rs:93:5
+   1:        0x10aee17d3 - std::backtrace_rs::backtrace::trace_unsynchronized::h71ecb3a9455536a6
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/../../backtrace/src/backtrace/mod.rs:66:5
+   2:        0x10aee17d3 - std::sys_common::backtrace::_print_fmt::h7e307467d6e88eaf
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:65:5
+   3:        0x10aee17d3 - <std::sys_common::backtrace::_print::DisplayBacktrace as core::fmt::Display>::fmt::he60192cdeae7ff98
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:44:22
+   4:        0x10aefdbeb - core::fmt::rt::Argument::fmt::hef24bdd6ecabdaa4
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/fmt/rt.rs:138:9
+   5:        0x10aefdbeb - core::fmt::write::hccf73e6ac9b102cd
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/fmt/mod.rs:1094:21
+   6:        0x10aede90e - std::io::Write::write_fmt::h2da296a2a97aa10d
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/io/mod.rs:1714:15
+   7:        0x10aee15ca - std::sys_common::backtrace::_print::h57786acb50d0c08a
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:47:5
+   8:        0x10aee15ca - std::sys_common::backtrace::print::h57a90601b74ca1dc
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:34:9
+   9:        0x10aee2aa5 - std::panicking::default_hook::{{closure}}::h8463146ca7fe4cbf
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:269:22
+  10:        0x10aee284f - std::panicking::default_hook::h473c81bbe30d7761
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:288:9
+  11:        0x10aee3000 - std::panicking::rust_panic_with_hook::h0ff95e3e20549b0d
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:705:13
+  12:        0x10aee2ee2 - std::panicking::begin_panic_handler::{{closure}}::h5e967ae12a1d4ba1
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:595:13
+  13:        0x10aee1bd9 - std::sys_common::backtrace::__rust_end_short_backtrace::h5c230463e113192d
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:151:18
+  14:        0x10aee2c5d - rust_begin_unwind
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:593:5
+  15:        0x10af075f3 - core::panicking::panic_nounwind_fmt::ha147f36c1e225894
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:96:14
+  16:        0x10af0769b - core::panicking::panic_nounwind::h59654c700fa02d0b
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:126:5
+  17:        0x10af07805 - core::panicking::panic_cannot_unwind::h1988846a6b7d7ed5
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/panicking.rs:189:5
+  18:        0x10ae18256 - connect_four::main::hd02805dfdfe48f89
+                               at /Users/jackcasey/cs-projects/Rust/ConnectFour/src/main.rs:12:1
+  19:        0x10ae0bbee - core::ops::function::FnOnce::call_once::hf5c23ac131faf89d
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ops/function.rs:250:5
+  20:        0x10ae379c1 - std::sys_common::backtrace::__rust_begin_short_backtrace::hc4f41948d2aa61c4
+                               at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/sys_common/backtrace.rs:135:18
+  21:        0x10ae286b4 - std::rt::lang_start::{{closure}}::hdb4b1d378bba8749
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:166:18
-  22:        0x1024ca23a - core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once::h4945e40fadb4e102
+  22:        0x10aedb32a - core::ops::function::impls::<impl core::ops::function::FnOnce<A> for &F>::call_once::h4945e40fadb4e102
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/core/src/ops/function.rs:284:13
-  23:        0x1024ca23a - std::panicking::try::do_call::h3f89e890c35ee58d
+  23:        0x10aedb32a - std::panicking::try::do_call::h3f89e890c35ee58d
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:500:40
-  24:        0x1024ca23a - std::panicking::try::hd7e13b924cbe36ec
+  24:        0x10aedb32a - std::panicking::try::hd7e13b924cbe36ec
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:464:19
-  25:        0x1024ca23a - std::panic::catch_unwind::h846dde69138eb551
+  25:        0x10aedb32a - std::panic::catch_unwind::h846dde69138eb551
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panic.rs:142:14
-  26:        0x1024ca23a - std::rt::lang_start_internal::{{closure}}::h0db65befb440833b
+  26:        0x10aedb32a - std::rt::lang_start_internal::{{closure}}::h0db65befb440833b
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:148:48
-  27:        0x1024ca23a - std::panicking::try::do_call::hf8ebe7d8efbefca2
+  27:        0x10aedb32a - std::panicking::try::do_call::hf8ebe7d8efbefca2
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:500:40
-  28:        0x1024ca23a - std::panicking::try::hb7bf29765365750b
+  28:        0x10aedb32a - std::panicking::try::hb7bf29765365750b
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panicking.rs:464:19
-  29:        0x1024ca23a - std::panic::catch_unwind::h49d9b5ea01685039
+  29:        0x10aedb32a - std::panic::catch_unwind::h49d9b5ea01685039
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/panic.rs:142:14
-  30:        0x1024ca23a - std::rt::lang_start_internal::hf7e13fcf609c9250
+  30:        0x10aedb32a - std::rt::lang_start_internal::hf7e13fcf609c9250
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:148:20
-  31:        0x1024173b7 - std::rt::lang_start::hdb28f1e22577fc41
+  31:        0x10ae28687 - std::rt::lang_start::h130402154e1fa82a
                                at /rustc/5680fa18feaa87f3ff04063800aec256c3d4b4be/library/std/src/rt.rs:165:17
-  32:        0x102435368 - _main
+  32:        0x10ae18538 - _main
   33:     0x7ff81853041f - <unknown>
 thread caused non-unwinding panic. aborting.

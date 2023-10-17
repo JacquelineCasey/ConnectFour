@@ -1,9 +1,13 @@
 
 mod board;
 mod screen;
+mod analysis;
+
+use std::sync::mpsc;
 
 use board::Board;
 use screen::ScreenManager;
+use analysis::spawn_analysis_thread;
 
 fn main() {
     let screen = ScreenManager::new();
@@ -11,9 +15,12 @@ fn main() {
 
     screen.update_board(board.clone());
 
+    let (analysis_send, analysis_receive) = mpsc::channel();
+    let analysis_thread = spawn_analysis_thread(screen.clone(), board.clone(), analysis_receive);
+
     while let Some(player) = board.next_to_move() {
         screen.update_board(board.clone());
-        screen.output_line(format!("{:?} to move", player));
+        screen.output_line(format!("{:?} to move. Input [1-7].", player));
 
         let buf = screen.read_line();
 
@@ -32,6 +39,8 @@ fn main() {
                 continue;
             }
         }
+
+        // TODO: Update analysis with played board.
     }
 
     screen.update_board(board.clone());
