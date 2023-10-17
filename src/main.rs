@@ -32,7 +32,7 @@ fn main() {
             }
         };
 
-        board = match board.play(i - 1, player) { // Subtract 1 to get to board coordinates
+        board = match board.play(i - 1, player, true) { // Subtract 1 to get to board coordinates
             Ok(next) => next,
             Err(msg) => {
                 screen.output_line(format!("{msg}"));

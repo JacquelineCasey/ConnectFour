@@ -17,23 +17,23 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
 
         loop {
             if time::Instant::now() - last_update > time::Duration::from_millis(200) {
+                match receiver.try_recv() {
+                    Ok(board) => {
+                        root_board = board;
+                        boundary = VecDeque::new();
+    
+                        if !evaluated_boards.contains_key(&root_board) {
+                            evaluated_boards.insert(root_board.clone(), root_board.get_score());
+                        }
+                    }
+                    Err(TryRecvError::Disconnected) => {
+                        panic!("They hung up!")
+                    }
+                    Err(_) => (),
+                }
+
                 last_update = time::Instant::now();
                 screen.update_analysis_count(evaluated_boards.len() as i32);
-            }
-
-            match receiver.try_recv() {
-                Ok(board) => {
-                    root_board = board;
-                    boundary = VecDeque::new();
-
-                    if !evaluated_boards.contains_key(&root_board) {
-                        evaluated_boards.insert(root_board.clone(), root_board.get_score());
-                    }
-                }
-                Err(TryRecvError::Disconnected) => {
-                    panic!("They hung up!")
-                }
-                Err(_) => (),
             }
 
             let Some(curr_board) = boundary.pop_front()

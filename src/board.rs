@@ -63,8 +63,8 @@ impl Board {
     }
 
     // Errors on wrong player or illegal move.
-    pub fn play(&self, col: i32, player: Player) -> Result<Board, String> {
-        if Some(player) != self.next_to_move() {
+    pub fn play(&self, col: i32, player: Player, validate_player: bool) -> Result<Board, String> {
+        if validate_player == true && Some(player) != self.next_to_move() {
             return Err("Bad player".into());
         }
         
@@ -177,12 +177,12 @@ impl Board {
     }
 
     pub fn next_boards(&self) -> Vec<Board> {
-        let mut boards = vec![];
+        let mut boards = Vec::with_capacity(7);  // flamegraph says 9% was copying here.
         let Some(player) = self.next_to_move()
             else { return boards };
 
         for i in 0..7 {
-            if let Ok(next) = self.play(i, player) {
+            if let Ok(next) = self.play(i, player, false) {  // validation turned off for speed!
                 boards.push(next);
             }
         }
