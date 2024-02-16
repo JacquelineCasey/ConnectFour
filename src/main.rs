@@ -15,7 +15,7 @@ fn main() {
 
     screen.update_board(board.clone());
 
-    let (_analysis_send, analysis_receive) = mpsc::channel();
+    let (analysis_send, analysis_receive) = mpsc::channel();
     let _analysis_thread = spawn_analysis_thread(screen.clone(), board.clone(), analysis_receive);
 
     while let Some(player) = board.next_to_move() {
@@ -38,9 +38,9 @@ fn main() {
                 screen.output_line(format!("{msg}"));
                 continue;
             }
-        }
+        };
 
-        // TODO: Update analysis with played board.
+        analysis_send.send(board.clone()).expect("Sends");
     }
 
     screen.update_board(board.clone());

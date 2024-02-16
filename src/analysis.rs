@@ -22,9 +22,11 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
                         root_board = board;
                         boundary = VecDeque::new();
     
-                        if !evaluated_boards.contains_key(&root_board) {
-                            evaluated_boards.insert(root_board.clone(), root_board.get_score());
-                        }
+                        // if !evaluated_boards.contains_key(&root_board) {
+                        //     evaluated_boards.insert(root_board.clone(), root_board.get_score());
+                        // }
+
+                        boundary.push_back(root_board.clone());
                     }
                     Err(TryRecvError::Disconnected) => {
                         panic!("They hung up!")
@@ -45,7 +47,10 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
                 update_parents(&evaluated_boards, &curr_board, &root_board)
             }
 
-            boundary.extend(curr_board.next_boards());
+            let score = evaluated_boards[&curr_board];
+            if score != 1000000000 && score != -1000000000 {
+                boundary.extend(curr_board.next_boards());
+            }
         }
     })
 }
