@@ -22,6 +22,8 @@ struct ScreenState {
     output_buffer: String,
     board: Option<Board>,
     analyzed_boards: i32,
+    root_score: i32,
+    next_move: i32,
 }
 
 fn truncate_output(str : String, i: u16) -> String {
@@ -36,7 +38,9 @@ fn analysis_paragraph(state: &ScreenState) -> String {
         None => "???".to_string(),
     };
 
-    format!("current score (naive): {score}\nboards analyzed: {}", state.analyzed_boards)
+    format!("current score (naive): {score}\nboards analyzed: {}\ncurrent score (analyzed): {}\nnext move:{}\n", 
+        state.analyzed_boards, state.root_score, state.next_move + 1
+    )
 }
 
 fn draw(terminal: &mut Term, state: &mut ScreenState) {
@@ -98,7 +102,14 @@ fn spawn_tui_thread(receiver: mpsc::Receiver<ScreenUpdate>, input_sender: mpsc::
         let mut terminal = Terminal::new(backend).expect("success");
 
         // State
-        let mut state = ScreenState { input_buffer: String::new(), output_buffer: String::new(), board: None, analyzed_boards: 0 };
+        let mut state = ScreenState { 
+            input_buffer: String::new(), 
+            output_buffer: String::new(), 
+            board: None, 
+            analyzed_boards: 0, 
+            root_score: 0,
+            next_move: -1,
+        };
 
         draw(&mut terminal, &mut state);
 
@@ -135,6 +146,8 @@ fn spawn_tui_thread(receiver: mpsc::Receiver<ScreenUpdate>, input_sender: mpsc::
                     }
                 },
                 ScreenUpdate::CrosstermEvent(_) => continue,
+                ScreenUpdate::RootScore(s) => state.root_score = s,
+                ScreenUpdate::NextMove(m) => state.next_move = m,
             }
 
             draw(&mut terminal, &mut state);
@@ -166,6 +179,8 @@ pub enum ScreenUpdate {
     UpdateOutput (String),
     CrosstermEvent (Event),
     AnalysisCount (i32),
+    RootScore (i32),
+    NextMove (i32),
 }
 
 #[derive(Clone)]
@@ -206,6 +221,14 @@ impl ScreenManager {
 
     pub fn update_analysis_count(&self, count: i32) {
         self.sender.send(ScreenUpdate::AnalysisCount(count)).expect("sent");
+    }
+
+    pub fn update_root_score(&self, score: i32) {
+        self.sender.send(ScreenUpdate::RootScore(score)).expect("sent");
+    }
+
+    pub fn update_recomended_move(&self, next_move: i32) {
+        self.sender.send(ScreenUpdate::NextMove(next_move)).expect("sent");
     }
 }
 

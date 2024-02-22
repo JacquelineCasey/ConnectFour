@@ -44,7 +44,7 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
             if !evaluated_boards.contains_key(&curr_board) {
                 evaluated_boards.insert(curr_board.clone(), curr_board.get_score());
 
-                update_parents(&evaluated_boards, &curr_board, &root_board)
+                update_parents(&mut evaluated_boards, &curr_board, &root_board, &screen);
             }
 
             let score = evaluated_boards[&curr_board];
@@ -55,13 +55,57 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
     })
 }
 
-fn update_parents(_evaluated_boards: &HashMap<Board, i32>, _curr_board: &Board, _root_board: &Board) {
-    // pass
-    
-    // Examine parents, updating their values as necessary. You can stop early if the existing value
-    // dominates.
+fn update_parents(evaluated_boards: &mut HashMap<Board, i32>, curr_board: &Board, root_board: &Board, screen: &ScreenManager) {
+    if curr_board == root_board {
+        screen.update_root_score(evaluated_boards[root_board]);
 
-    // Inform the other threads if the root is changed. Calculate next best move.
+        let Some(player) = curr_board.next_to_move()
+            else {return};
 
-    // Do not go past the turn of root_board. Ideally, we could prune unreachable states? Maybe mark them?
+        let mut next_move = -1;
+        for col in 0..7 {
+            let Ok(child) = curr_board.play(col, player, false)
+                else {continue};
+
+            match evaluated_boards.get(&child) {
+                Some(val) if val == &evaluated_boards[root_board] => {
+                    next_move = col;
+                },
+                _ => (),
+            }
+        }
+        
+        screen.update_recomended_move(next_move);
+
+        return;
+    }
+
+    let parent_boards = curr_board.prev_boards();
+
+    for parent_board in parent_boards {
+        let parent_player = parent_board.next_to_move().unwrap();  // Is this repeated? Yes.
+        // But there's a chance of getting none (on win) if we do it above...
+
+        if !evaluated_boards.contains_key(&parent_board) {
+            continue;
+        }
+
+        let siblings = parent_board.next_boards();
+
+        let scores = siblings.iter()
+            .map(|b| evaluated_boards.get(b))
+            .flatten()
+            .map(|i| i.clone());
+
+        let score = match parent_player {
+            crate::board::Player::Red => scores.max(),
+            crate::board::Player::Yellow => scores.min(),
+        }.unwrap();
+
+        if evaluated_boards[&parent_board] != score {
+            evaluated_boards.insert(parent_board.clone(), score);
+
+            update_parents(evaluated_boards, &parent_board, root_board, screen)
+        }
+    }
 }
