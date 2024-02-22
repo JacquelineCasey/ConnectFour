@@ -20,6 +20,9 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
                 match receiver.try_recv() {
                     Ok(board) => {
                         root_board = board;
+                        
+                        send_root_info(&mut evaluated_boards, &root_board, &screen);
+
                         boundary = VecDeque::new();
     
                         // if !evaluated_boards.contains_key(&root_board) {
@@ -47,36 +50,38 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
                 update_parents(&mut evaluated_boards, &curr_board, &root_board, &screen);
             }
 
-            let score = evaluated_boards[&curr_board];
-            if score != 1000000000 && score != -1000000000 {
+            if let None = curr_board.winner() {
                 boundary.extend(curr_board.next_boards());
             }
         }
     })
 }
 
+fn send_root_info(evaluated_boards: &mut HashMap<Board, i32>, root_board: &Board, screen: &ScreenManager) {
+    screen.update_root_score(evaluated_boards[root_board]);
+
+    let Some(player) = root_board.next_to_move()
+        else {return};
+
+    let mut next_move = -1;
+    for col in 0..7 {
+        let Ok(child) = root_board.play(col, player, false)
+            else {continue};
+
+        match evaluated_boards.get(&child) {
+            Some(val) if val == &evaluated_boards[root_board] => {
+                next_move = col;
+            },
+            _ => (),
+        }
+    }
+    
+    screen.update_recomended_move(next_move);
+}
+
 fn update_parents(evaluated_boards: &mut HashMap<Board, i32>, curr_board: &Board, root_board: &Board, screen: &ScreenManager) {
     if curr_board == root_board {
-        screen.update_root_score(evaluated_boards[root_board]);
-
-        let Some(player) = curr_board.next_to_move()
-            else {return};
-
-        let mut next_move = -1;
-        for col in 0..7 {
-            let Ok(child) = curr_board.play(col, player, false)
-                else {continue};
-
-            match evaluated_boards.get(&child) {
-                Some(val) if val == &evaluated_boards[root_board] => {
-                    next_move = col;
-                },
-                _ => (),
-            }
-        }
-        
-        screen.update_recomended_move(next_move);
-
+        send_root_info(evaluated_boards, root_board, screen);
         return;
     }
 
