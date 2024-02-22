@@ -1,3 +1,5 @@
+use std::io::Empty;
+
 
 #[derive(Hash, Clone, Copy, Eq, PartialEq, Debug)]
 pub enum Player {
@@ -5,13 +7,22 @@ pub enum Player {
     Yellow,
 }
 
-#[derive(Hash, Clone, Copy, Eq, PartialEq)]
+impl Player {
+    pub fn opponent(&self) -> Player {
+        match self {
+            Player::Red => Player::Yellow,
+            Player::Yellow => Player::Red
+        }
+    }
+}
+
+#[derive(Hash, Clone, Copy, Eq, PartialEq, Debug)]
 pub enum Tile {
     Empty,
     Piece(Player),
 }
 
-#[derive(Hash, Clone, Eq, PartialEq)]
+#[derive(Hash, Clone, Eq, PartialEq, Debug)]
 pub struct Board {
     pub tiles: [[Tile; 7]; 6], // row 0 is bottom!
 }
@@ -190,6 +201,40 @@ impl Board {
         boards
     }
 
+    pub fn prev_boards(&self) -> Vec<Board> {
+        let mut boards = Vec::with_capacity(7);
+
+        let Some(player) = self.next_to_move().map(|p| Player::opponent(&p))
+            else { return boards };
+
+        for i in 0..7 {
+            for j in 0..6 {
+                if self.tiles[j][i] == Tile::Empty {
+                    if j == 0 {
+                        break;
+                    }
+
+                    if self.tiles[j - 1][i] == Tile::Piece(player) {
+                        let mut new_board = self.clone();
+
+                        new_board.tiles[j - 1][i] = Tile::Empty;
+                        boards.push(new_board);
+                    }
+
+                    break;
+                }
+                else if j == 5 && self.tiles[j][i] == Tile::Piece(player) {
+                    let mut new_board = self.clone();
+
+                    new_board.tiles[j][i] = Tile::Empty;
+                    boards.push(new_board);
+                }
+            }
+        }
+
+        boards
+    }
+
     fn score_window(window: &[AnalyzedTile]) -> i32 {
         assert!(window.len() == 4);
 
@@ -276,5 +321,30 @@ impl Board {
         }
 
         score
+    }
+}
+
+#[cfg(test)]
+mod test {
+    pub use super::*;
+
+    #[test]
+    fn prev_board_sane() {
+        let b1 = Board::new();
+
+        let b2 = b1.play(0, Player::Red, true).expect("Works");
+
+        assert!(b1 == b2.prev_boards()[0]);
+
+        let b3 = b2.play(0, Player::Yellow, true).expect("Works");
+
+        assert!(b2 == b3.prev_boards()[0]);
+
+        let b4 = b3.play(0, Player::Red, true).expect("Works");
+        let b5 = b4.play(0, Player::Yellow, true).expect("Works");
+        let b6 = b5.play(0, Player::Red, true).expect("Works");
+        let b7 = b6.play(0, Player::Yellow, true).expect("Works");
+
+        assert!(b6 == b7.prev_boards()[0]);
     }
 }
