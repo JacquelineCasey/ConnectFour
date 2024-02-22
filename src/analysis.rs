@@ -50,6 +50,8 @@ pub fn spawn_analysis_thread(screen: ScreenManager,
                 update_parents(&mut evaluated_boards, &curr_board, &root_board, &screen);
             }
 
+
+            /* Can this be made better with killer move optimization? */
             if let None = curr_board.winner() {
                 boundary.extend(curr_board.next_boards());
             }

@@ -1,5 +1,3 @@
-use std::io::Empty;
-
 
 #[derive(Hash, Clone, Copy, Eq, PartialEq, Debug)]
 pub enum Player {
@@ -289,6 +287,7 @@ impl Board {
         score
     }
 
+    #[allow(unused)]
     fn pieces_played(&self) -> i32 {
         let mut count = 0;
         for row in self.tiles {

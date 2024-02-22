@@ -4,7 +4,7 @@ use tui::{
     backend::CrosstermBackend,
     widgets::{Block, Borders, Paragraph},
     layout::{Rect, Margin},
-    Terminal, style::{Style, Modifier}
+    Terminal
 };
 
 use crossterm::{
