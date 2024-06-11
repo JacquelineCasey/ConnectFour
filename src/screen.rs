@@ -38,7 +38,7 @@ fn analysis_paragraph(state: &ScreenState) -> String {
         None => "???".to_string(),
     };
 
-    format!("current score (naive): {score}\nboards analyzed: {}\ncurrent score (analyzed): {}\nnext move:{}\n", 
+    format!("current score (naive): {score}\nboards analyzed: {}\ncurrent score (analyzed): {}\nnext move: {}\n", 
         state.analyzed_boards, state.root_score, state.next_move + 1
     )
 }
